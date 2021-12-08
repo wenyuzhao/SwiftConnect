@@ -1,5 +1,5 @@
 //
-//  LoginUtils.swift
+//  VPNUtils.swift
 //  SwiftConnect
 //
 //  Created by Wenyu Zhao on 8/12/2021.

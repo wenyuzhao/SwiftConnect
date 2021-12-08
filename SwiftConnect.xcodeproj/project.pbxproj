@@ -11,7 +11,7 @@
 		EFC2DB1F276041FB00E051A1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFC2DB1E276041FB00E051A1 /* ContentView.swift */; };
 		EFC2DB21276041FC00E051A1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EFC2DB20276041FC00E051A1 /* Assets.xcassets */; };
 		EFC2DB24276041FC00E051A1 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EFC2DB23276041FC00E051A1 /* Preview Assets.xcassets */; };
-		EFC2DB2C2760527800E051A1 /* LoginUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFC2DB2B2760527800E051A1 /* LoginUtils.swift */; };
+		EFC2DB2C2760527800E051A1 /* VPNUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFC2DB2B2760527800E051A1 /* VPNUtils.swift */; };
 		EFC2DB312760563400E051A1 /* SwiftShell in Frameworks */ = {isa = PBXBuildFile; productRef = EFC2DB302760563400E051A1 /* SwiftShell */; };
 		EFC2DB352760939300E051A1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFC2DB342760939300E051A1 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
@@ -23,7 +23,7 @@
 		EFC2DB20276041FC00E051A1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		EFC2DB23276041FC00E051A1 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		EFC2DB25276041FC00E051A1 /* SwiftConnect.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SwiftConnect.entitlements; sourceTree = "<group>"; };
-		EFC2DB2B2760527800E051A1 /* LoginUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginUtils.swift; sourceTree = "<group>"; };
+		EFC2DB2B2760527800E051A1 /* VPNUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNUtils.swift; sourceTree = "<group>"; };
 		EFC2DB332760936600E051A1 /* SwiftConnectDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SwiftConnectDebug.entitlements; sourceTree = "<group>"; };
 		EFC2DB342760939300E051A1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -61,7 +61,7 @@
 			children = (
 				EFC2DB1C276041FB00E051A1 /* SwiftConnectApp.swift */,
 				EFC2DB1E276041FB00E051A1 /* ContentView.swift */,
-				EFC2DB2B2760527800E051A1 /* LoginUtils.swift */,
+				EFC2DB2B2760527800E051A1 /* VPNUtils.swift */,
 				EFC2DB342760939300E051A1 /* AppDelegate.swift */,
 				EFC2DB20276041FC00E051A1 /* Assets.xcassets */,
 				EFC2DB25276041FC00E051A1 /* SwiftConnect.entitlements */,
@@ -158,7 +158,7 @@
 				EFC2DB352760939300E051A1 /* AppDelegate.swift in Sources */,
 				EFC2DB1F276041FB00E051A1 /* ContentView.swift in Sources */,
 				EFC2DB1D276041FB00E051A1 /* SwiftConnectApp.swift in Sources */,
-				EFC2DB2C2760527800E051A1 /* LoginUtils.swift in Sources */,
+				EFC2DB2C2760527800E051A1 /* VPNUtils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
