@@ -58,8 +58,11 @@ struct VPNLoginScreen: View {
                 if saveToKeychain {
                     credentials.save()
                 }
-                vpn.start(username: credentials.username, password: credentials.password)
-            
+                AppDelegate.pinPopover = true
+                vpn.kill()
+                vpn.start(username: credentials.username, password: credentials.password) { succ in
+                    AppDelegate.pinPopover = false
+                }
             }) {
                 Text("Connect")
             }.keyboardShortcut(.defaultAction)

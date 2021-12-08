@@ -42,31 +42,68 @@ class VPNController: ObservableObject {
     @Published public var state: VPNState = .stopped
     @Published public var proto: VPNProtocol = .globalProtect
     
-    let logPath: String;
-    let file: FileHandle
-    let source: DispatchSourceFileSystemObject
+//    let logPath = "\(NSTemporaryDirectory())/\(NSUUID().uuidString)";
+//    lazy var logPathUrl = URL(fileURLWithPath: logPath);
     
-    func start(username: String, password: String) {
-        print("[openconnect start]")
+    func start(username: String, password: String, _ onLaunch: @escaping (_ succ: Bool) -> Void) {
         state = .processing
+        AppDelegate.handleConnectionChange(false)
+        // Prepare commands
+        print("[openconnect start]")
+        let logPath = "\(NSTemporaryDirectory())/\(NSUUID().uuidString)";
+        let logPathUrl = URL(fileURLWithPath: logPath);
+        try! "".write(to: logPathUrl, atomically: true, encoding: .utf8)
         print("[output \(logPath)]")
         let shellCommand = "sudo /usr/local/bin/openconnect --protocol=\(proto.id) student-access.anu.edu.au -u \(username) --passwd-on-stdin --reconnect-timeout 100000";
         let shellCommandWithIO = "\(shellCommand) <<< \(password) &> \(logPath)";
         print("[cmd: \(shellCommand)]")
+        // Launch
+        var launched = false;
+        let file = try! FileHandle(forReadingFrom: logPathUrl)
+        watchLaunch(file: file) {
+            launched = true;
+            onLaunch(true)
+        }
         let command = runAsync("osascript", "-e", """
             do shell script \"\(shellCommandWithIO)\" with prompt \"Start OpenConnect\" with administrator privileges
         """);
+        // Completion callback
         command.onCompletion { _ in
             if self.state != .stopped {
                 DispatchQueue.main.async {
                     if self.state != .stopped {
                         self.state = .stopped
+                        AppDelegate.handleConnectionChange(false)
                     }
                 }
-            
             }
+            if !launched {
+                onLaunch(false)
+            }
+            try? file.close()
             print("[openconnect completed]")
         }
+    }
+    
+    func watchLaunch(file: FileHandle, callback: @escaping () -> Void) {
+        let source = DispatchSource.makeFileSystemObjectSource(
+            fileDescriptor: file.fileDescriptor,
+            eventMask: .extend,
+            queue: DispatchQueue.main
+        )
+        source.setEventHandler {
+            guard source.data.contains(.extend) else { return }
+            if self.state == .processing {
+                self.state = .launched
+                AppDelegate.handleConnectionChange(true)
+                callback()
+            }
+        }
+        source.setCancelHandler {
+            try? file.close()
+        }
+        file.seekToEndOfFile()
+        source.resume()
     }
     
     func kill() {
@@ -74,39 +111,7 @@ class VPNController: ObservableObject {
         print("[kill openconnect]")
         run("pkill", "-9", "openconnect");
         state = .stopped
-    }
-    
-    init() {
-        logPath = "\(NSTemporaryDirectory())/\(NSUUID().uuidString)";
-        let url = URL(fileURLWithPath: logPath)
-        try! "".write(to: url, atomically: true, encoding: .utf8)
-        file = try! FileHandle(forReadingFrom: url)
-        source = DispatchSource.makeFileSystemObjectSource(
-            fileDescriptor: file.fileDescriptor,
-            eventMask: .extend,
-            queue: DispatchQueue.main
-        )
-        source.setEventHandler {
-            self.handleLogFileEvent(event: self.source.data)
-        }
-        source.setCancelHandler {
-            try? self.file.close()
-        }
-        file.seekToEndOfFile()
-        source.resume()
-    }
-    
-    deinit {
-        source.cancel()
-    }
-
-    func handleLogFileEvent(event: DispatchSource.FileSystemEvent) {
-        guard event.contains(.extend) else {
-            return
-        }
-        if self.state == .processing {
-            self.state = .launched
-        }
+        AppDelegate.handleConnectionChange(false)
     }
 }
 

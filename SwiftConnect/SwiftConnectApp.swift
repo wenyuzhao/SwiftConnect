@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct SwiftConnectApp: App {
+    @NSApplicationDelegateAdaptor var appDelegate: AppDelegate
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            EmptyView().hidden()
         }
     }
 }
