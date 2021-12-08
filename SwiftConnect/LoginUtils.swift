@@ -54,7 +54,7 @@ class VPNController: ObservableObject {
         let logPathUrl = URL(fileURLWithPath: logPath);
         try! "".write(to: logPathUrl, atomically: true, encoding: .utf8)
         print("[output \(logPath)]")
-        let shellCommand = "sudo /usr/local/bin/openconnect --protocol=\(proto.id) student-access.anu.edu.au -u \(username) --passwd-on-stdin --reconnect-timeout 100000";
+        let shellCommand = "sudo /usr/local/bin/openconnect --protocol=\(proto.id) student-access.anu.edu.au -u \(username) --passwd-on-stdin";
         let shellCommandWithIO = "\(shellCommand) <<< \(password) &> \(logPath)";
         print("[cmd: \(shellCommand)]")
         // Launch
