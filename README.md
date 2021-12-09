@@ -1,3 +1,5 @@
 # SwiftConnect
 
-Openconnect GUI client
+An openconnect GUI client for macOS.
+
+![Screenshot](screenshots/connected.png)
