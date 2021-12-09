@@ -113,6 +113,11 @@ class VPNController: ObservableObject {
         state = .stopped
         AppDelegate.handleConnectionChange(false)
     }
+    
+    static func killOpenConnect() {
+        print("[kill openconnect]")
+        run("pkill", "-9", "openconnect");
+    }
 }
 
 
