@@ -62,6 +62,9 @@ struct VPNLoginScreen: View {
                 vpn.kill()
                 vpn.start(username: credentials.username, password: credentials.password) { succ in
                     AppDelegate.pinPopover = false
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        AppDelegate.shared.closePopover()
+                    }
                 }
             }) {
                 Text("Connect")

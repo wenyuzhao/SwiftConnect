@@ -11,6 +11,7 @@ import SwiftUI
 
 
 class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
+    static var shared: AppDelegate!;
     static var pinPopover = false
     static var handleConnectionChange: (_ connected: Bool) -> Void = { _ in };
     
@@ -36,13 +37,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private lazy var contextMenu: ContextMenu = ContextMenu(statusBarItem: statusItem)
 
     func applicationWillFinishLaunching(_ notification: Notification) {
+        Self.shared = self;
         // Hide app window
         NSApplication.shared.windows.first?.close()
     }
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Hide from dock
-        NSApp.setActivationPolicy(.prohibited)
+        NSApp.setActivationPolicy(.accessory)
         // Hide app window
         if let window = NSApplication.shared.windows.first {
             window.close()
@@ -65,16 +67,23 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     }
     
     @objc func togglePopover(sender: AnyObject) {
-        let event = NSApp.currentEvent!
-        if event.type ==  NSEvent.EventType.leftMouseUp {
+        if NSApp.currentEvent!.type ==  NSEvent.EventType.leftMouseUp {
             if (popover.isShown) {
-                popover.performClose(sender)
+                closePopover()
             } else {
-                popover.show(relativeTo: statusItem.button!.bounds, of: statusItem.button!, preferredEdge: NSRectEdge.maxY)
+                openPopover()
             }
         } else {
             contextMenu.show()
         }
+    }
+    
+    func openPopover() {
+        popover.show(relativeTo: statusItem.button!.bounds, of: statusItem.button!, preferredEdge: NSRectEdge.maxY)
+    }
+    
+    func closePopover() {
+        popover.performClose(self)
     }
 }
 
