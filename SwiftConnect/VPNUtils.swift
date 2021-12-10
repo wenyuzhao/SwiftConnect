@@ -42,8 +42,7 @@ class VPNController: ObservableObject {
     @Published public var state: VPNState = .stopped
     @Published public var proto: VPNProtocol = .globalProtect
     
-//    let logPath = "\(NSTemporaryDirectory())/\(NSUUID().uuidString)";
-//    lazy var logPathUrl = URL(fileURLWithPath: logPath);
+    private var currentLogURL: URL?;
     
     func start(username: String, password: String, _ onLaunch: @escaping (_ succ: Bool) -> Void) {
         state = .processing
@@ -52,6 +51,7 @@ class VPNController: ObservableObject {
         print("[openconnect start]")
         let logPath = "\(NSTemporaryDirectory())/\(NSUUID().uuidString)";
         let logPathUrl = URL(fileURLWithPath: logPath);
+        currentLogURL = logPathUrl
         try! "".write(to: logPathUrl, atomically: true, encoding: .utf8)
         print("[output \(logPath)]")
         let shellCommand = "sudo /usr/local/bin/openconnect --protocol=\(proto.id) student-access.anu.edu.au -u \(username) --passwd-on-stdin";
@@ -117,6 +117,12 @@ class VPNController: ObservableObject {
     static func killOpenConnect() {
         print("[kill openconnect]")
         run("pkill", "-9", "openconnect");
+    }
+    
+    func openLogFile() {
+        if let url = currentLogURL {
+            NSWorkspace.shared.open(url)
+        }
     }
 }
 

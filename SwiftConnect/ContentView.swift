@@ -23,16 +23,32 @@ struct VPNLaunchedScreen: View {
     @EnvironmentObject var vpn: VPNController
     
     var body: some View {
-        VStack {
-            Image( "Connected")
-                .resizable()
-                .scaledToFit()
-            Text("🌐 VPN Connected!")
-            Spacer().frame(height: 20)
-            Button(action: { vpn.kill() }) {
-                Text("Disconnect")
-            }.keyboardShortcut(.defaultAction)
+        ZStack {
+            VStack {
+                Image("Connected")
+                    .resizable()
+                    .scaledToFit()
+                Text("🌐 VPN Connected!")
+                Spacer().frame(height: 20)
+                Button(action: { vpn.kill() }) {
+                    Text("Disconnect")
+                }.keyboardShortcut(.defaultAction)
         }
+        Button(action: { vpn.openLogFile() }) {
+            Text("logs").underline()
+                .foregroundColor(Color.gray)
+                .fixedSize(horizontal: false, vertical: true)
+        }.buttonStyle(PlainButtonStyle())
+                .position(x: 150, y: 155)
+        }
+    }
+}
+
+struct VPNLaunchedScreen_Previews: PreviewProvider {
+    static var previews: some View {
+        VPNLaunchedScreen()
+            .padding(EdgeInsets(top: 30, leading: 30, bottom: 30, trailing: 30))
+            .frame(width: 200, height: 200).background(VisualEffect())
     }
 }
 
