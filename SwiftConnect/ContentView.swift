@@ -69,23 +69,15 @@ struct VPNLoginScreen: View {
             }
             TextField("Portal", text: $credentials.portal)
             TextField("Username", text: $credentials.username)
-            SecureField("Password", text: $credentials.password)
+            SecureField("Password", text: $credentials.password).onSubmit {
+                vpn.start(credentials: credentials, save: saveToKeychain)
+            }
             Toggle(isOn: $saveToKeychain) {
                 Text("Save to Keychain")
             }.toggleStyle(CheckboxToggleStyle())
             Spacer().frame(height: 25)
             Button(action: {
-                if saveToKeychain {
-                    credentials.save()
-                }
-                AppDelegate.pinPopover = true
-                vpn.kill()
-                vpn.start(portal: credentials.portal, username: credentials.username, password: credentials.password) { succ in
-                    AppDelegate.pinPopover = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                        AppDelegate.shared.closePopover()
-                    }
-                }
+                vpn.start(credentials: credentials, save: saveToKeychain)
             }) {
                 Text("Connect")
             }.keyboardShortcut(.defaultAction)
