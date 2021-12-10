@@ -172,7 +172,7 @@ class KeychainService: NSObject {
         let attributes: [String: Any] = [
             kSecAttrAccount as String: username,
             kSecValueData as String: password,
-            kSecAttrGeneric as String: portal,
+            kSecAttrDescription as String: portal,
         ]
         let status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
         if status == errSecItemNotFound {
@@ -181,7 +181,7 @@ class KeychainService: NSObject {
                 kSecAttrAccount as String: username,
                 kSecAttrServer as String: Self.server,
                 kSecValueData as String: password,
-                kSecAttrGeneric as String: portal,
+                kSecAttrDescription as String: portal,
             ]
             let status = SecItemAdd(query as CFDictionary, nil)
             return status == errSecSuccess
@@ -208,7 +208,7 @@ class KeychainService: NSObject {
             let passwordData = existingItem[kSecValueData as String] as? Data,
             let password = String(data: passwordData, encoding: String.Encoding.utf8),
             let username = existingItem[kSecAttrAccount as String] as? String,
-            let portal = existingItem[kSecAttrGeneric as String] as? String
+            let portal = existingItem[kSecAttrDescription as String] as? String
         else {
             return nil
         }
