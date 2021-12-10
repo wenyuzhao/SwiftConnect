@@ -49,7 +49,6 @@ class VPNController: ObservableObject {
             credentials.save()
         }
         AppDelegate.shared.pinPopover = true
-        kill()
         start(portal: credentials.portal, username: credentials.username, password: credentials.password) { succ in
             AppDelegate.shared.pinPopover = false
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -68,7 +67,7 @@ class VPNController: ObservableObject {
         currentLogURL = logPathUrl
         try! "".write(to: logPathUrl, atomically: true, encoding: .utf8)
         print("[output \(logPath)]")
-        let shellCommand = "sudo /usr/local/bin/openconnect --protocol=\(proto.id) \(portal) -u \(username) --passwd-on-stdin";
+        let shellCommand = "sudo pkill -9 openconnect; sudo /usr/local/bin/openconnect --protocol=\(proto.id) \(portal) -u \(username) --passwd-on-stdin";
         let shellCommandWithIO = "\(shellCommand) <<< \(password) &> \(logPath)";
         print("[cmd: \(shellCommand)]")
         // Launch
@@ -122,15 +121,16 @@ class VPNController: ObservableObject {
     
     func kill() {
         state = .processing
-        print("[kill openconnect]")
-        run("pkill", "-9", "openconnect");
+        Self.killOpenConnect();
         state = .stopped
         AppDelegate.shared.vpnConnectionDidChange(connected: false)
     }
     
     static func killOpenConnect() {
         print("[kill openconnect]")
-        run("pkill", "-9", "openconnect");
+        run("osascript", "-e", """
+            do shell script \"pkill -9 openconnect\" with prompt \"Stop OpenConnect\" with administrator privileges
+        """)
     }
     
     func openLogFile() {
