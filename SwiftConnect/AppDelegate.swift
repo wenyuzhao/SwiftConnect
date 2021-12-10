@@ -12,7 +12,8 @@ import SwiftUI
 
 class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     static var shared: AppDelegate!;
-    static var pinPopover = false
+    
+    var pinPopover = false
     
     private lazy var icon: NSImage = {
         let image = NSImage(named: "AppIcon")!
@@ -70,7 +71,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     }
     
     func popoverShouldClose(_ popover: NSPopover) -> Bool {
-        return !Self.pinPopover
+        return !pinPopover
     }
     
     @objc func togglePopover(sender: AnyObject) {
@@ -101,12 +102,19 @@ class ContextMenu: NSObject, NSMenuDelegate {
     func buildContextMenu() -> NSMenu {
         let menu = NSMenu(title: "Status Bar Menu")
         menu.delegate = self
-        menu.addItem(
-            withTitle: "🌐 SwiftConnect",
-            action: nil,
+        // Title
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
+        let title = menu.addItem(
+            withTitle: "SwiftConnect v\(appVersion)",
+            action: #selector(self.openProjectURL(_:)),
             keyEquivalent: ""
         )
+        title.image = NSImage(named: "AppIcon")!
+        title.image?.isTemplate = true
+        title.target = self
+        // Separator
         menu.addItem(NSMenuItem.separator())
+        // Quit button
         let qitem = menu.addItem(
             withTitle: "⎋ Quit",
             action: #selector(self.quit(_:)),
@@ -131,7 +139,11 @@ class ContextMenu: NSObject, NSMenuDelegate {
     }
 
     @objc func menuDidClose(_ menu: NSMenu) {
-        statusBarItem.menu = nil // remove menu so button works as before
+        statusBarItem.menu = nil
+    }
+    
+    @objc func openProjectURL(_ menu: NSMenuItem) {
+        NSWorkspace.shared.open(URL(string: "https://github.com/wenyuzhao/SwiftConnect")!)
     }
 }
 

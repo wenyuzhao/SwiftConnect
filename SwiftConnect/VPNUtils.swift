@@ -48,17 +48,17 @@ class VPNController: ObservableObject {
         if save {
             credentials.save()
         }
-        AppDelegate.pinPopover = true
+        AppDelegate.shared.pinPopover = true
         kill()
         start(portal: credentials.portal, username: credentials.username, password: credentials.password) { succ in
-            AppDelegate.pinPopover = false
+            AppDelegate.shared.pinPopover = false
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 AppDelegate.shared.closePopover()
             }
         }
     }
     
-    func start(portal: String, username: String, password: String, _ onLaunch: @escaping (_ succ: Bool) -> Void) {
+    private func start(portal: String, username: String, password: String, _ onLaunch: @escaping (_ succ: Bool) -> Void) {
         state = .processing
         AppDelegate.shared.vpnConnectionDidChange(connected: false)
         // Prepare commands
