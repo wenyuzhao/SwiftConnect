@@ -7,6 +7,9 @@
 
 import SwiftUI
 
+let windowSize = CGSize(width: 200, height: 230)
+let windowInsets = EdgeInsets(top: 30, leading: 30, bottom: 30, trailing: 30)
+
 struct VisualEffect: NSViewRepresentable {
     func makeNSView(context: Self.Context) -> NSView {
         let visualEffect = NSVisualEffectView();
@@ -29,7 +32,7 @@ struct VPNLaunchedScreen: View {
                     .resizable()
                     .scaledToFit()
                 Text("🌐 VPN Connected!")
-                Spacer().frame(height: 20)
+                Spacer().frame(height: 25)
                 Button(action: { vpn.kill() }) {
                     Text("Disconnect")
                 }.keyboardShortcut(.defaultAction)
@@ -39,7 +42,7 @@ struct VPNLaunchedScreen: View {
                 .foregroundColor(Color.gray)
                 .fixedSize(horizontal: false, vertical: true)
         }.buttonStyle(PlainButtonStyle())
-                .position(x: 150, y: 155)
+                .position(x: 155, y: 190)
         }
     }
 }
@@ -47,8 +50,8 @@ struct VPNLaunchedScreen: View {
 struct VPNLaunchedScreen_Previews: PreviewProvider {
     static var previews: some View {
         VPNLaunchedScreen()
-            .padding(EdgeInsets(top: 30, leading: 30, bottom: 30, trailing: 30))
-            .frame(width: 200, height: 200).background(VisualEffect())
+            .padding(windowInsets)
+            .frame(width: windowSize.width, height: windowSize.height).background(VisualEffect())
     }
 }
 
@@ -63,9 +66,10 @@ struct VPNLoginScreen: View {
                 ForEach(VPNProtocol.allCases, id: \.self) {
                     Text($0.name)
                 }
-            }.frame(width: 120)
-            TextField("Username", text: $credentials.username).frame(width: 120)
-            SecureField("Password", text: $credentials.password).frame(width: 120)
+            }
+            TextField("Portal", text: $credentials.portal)
+            TextField("Username", text: $credentials.username)
+            SecureField("Password", text: $credentials.password)
             Toggle(isOn: $saveToKeychain) {
                 Text("Save to Keychain")
             }.toggleStyle(CheckboxToggleStyle())
@@ -76,7 +80,7 @@ struct VPNLoginScreen: View {
                 }
                 AppDelegate.pinPopover = true
                 vpn.kill()
-                vpn.start(username: credentials.username, password: credentials.password) { succ in
+                vpn.start(portal: credentials.portal, username: credentials.username, password: credentials.password) { succ in
                     AppDelegate.pinPopover = false
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                         AppDelegate.shared.closePopover()
@@ -102,8 +106,8 @@ struct ContentView: View {
             case .launched: VPNLaunchedScreen()
             }
         }
-        .padding(EdgeInsets(top: 30, leading: 30, bottom: 30, trailing: 30))
-        .frame(width: 200, height: 200).background(VisualEffect()).environmentObject(vpn).environmentObject(credentials)
+        .padding(windowInsets)
+        .frame(width: windowSize.width, height: windowSize.height).background(VisualEffect()).environmentObject(vpn).environmentObject(credentials)
     }
 }
 

@@ -10,7 +10,7 @@ import SwiftShell
 import SwiftUI
 import Security
 
-//let logPath = "\(NSTemporaryDirectory())/\(NSUUID().uuidString)";
+
 
 enum VPNState {
     case stopped, processing, launched
@@ -44,7 +44,7 @@ class VPNController: ObservableObject {
     
     private var currentLogURL: URL?;
     
-    func start(username: String, password: String, _ onLaunch: @escaping (_ succ: Bool) -> Void) {
+    func start(portal: String, username: String, password: String, _ onLaunch: @escaping (_ succ: Bool) -> Void) {
         state = .processing
         AppDelegate.shared.vpnConnectionDidChange(connected: false)
         // Prepare commands
@@ -54,7 +54,7 @@ class VPNController: ObservableObject {
         currentLogURL = logPathUrl
         try! "".write(to: logPathUrl, atomically: true, encoding: .utf8)
         print("[output \(logPath)]")
-        let shellCommand = "sudo /usr/local/bin/openconnect --protocol=\(proto.id) student-access.anu.edu.au -u \(username) --passwd-on-stdin";
+        let shellCommand = "sudo /usr/local/bin/openconnect --protocol=\(proto.id) \(portal) -u \(username) --passwd-on-stdin";
         let shellCommandWithIO = "\(shellCommand) <<< \(password) &> \(logPath)";
         print("[cmd: \(shellCommand)]")
         // Launch
@@ -129,6 +129,7 @@ class VPNController: ObservableObject {
 
 
 class Credentials: ObservableObject {
+    @Published public var portal: String
     @Published public var username: String
     @Published public var password: String
     
@@ -136,18 +137,21 @@ class Credentials: ObservableObject {
         if let data = KeychainService.shared.load() {
             username = data.username
             password = data.password
+            portal = data.portal
         } else {
+            portal = "student-access.anu.edu.au"
             username = ""
             password = ""
         }
     }
     
     func save() {
-        let _ = KeychainService.shared.insertOrUpdate(credentials: CredentialsData(username: username, password: password))
+        let _ = KeychainService.shared.insertOrUpdate(credentials: CredentialsData(portal: portal, username: username, password: password))
     }
 }
 
 struct CredentialsData {
+    let portal: String
     let username: String
     let password: String
 }
@@ -160,6 +164,7 @@ class KeychainService: NSObject {
     func insertOrUpdate(credentials: CredentialsData) -> Bool {
         let username = credentials.username
         let password = credentials.password.data(using: String.Encoding.utf8)!
+        let portal = credentials.portal
         let query: [String: Any] = [
             kSecClass as String: kSecClassInternetPassword,
             kSecAttrServer as String: Self.server,
@@ -167,6 +172,7 @@ class KeychainService: NSObject {
         let attributes: [String: Any] = [
             kSecAttrAccount as String: username,
             kSecValueData as String: password,
+            kSecAttrGeneric as String: portal,
         ]
         let status = SecItemUpdate(query as CFDictionary, attributes as CFDictionary)
         if status == errSecItemNotFound {
@@ -174,7 +180,8 @@ class KeychainService: NSObject {
                 kSecClass as String: kSecClassInternetPassword,
                 kSecAttrAccount as String: username,
                 kSecAttrServer as String: Self.server,
-                kSecValueData as String: password
+                kSecValueData as String: password,
+                kSecAttrGeneric as String: portal,
             ]
             let status = SecItemAdd(query as CFDictionary, nil)
             return status == errSecSuccess
@@ -200,11 +207,12 @@ class KeychainService: NSObject {
         guard let existingItem = item as? [String : Any],
             let passwordData = existingItem[kSecValueData as String] as? Data,
             let password = String(data: passwordData, encoding: String.Encoding.utf8),
-            let username = existingItem[kSecAttrAccount as String] as? String
+            let username = existingItem[kSecAttrAccount as String] as? String,
+            let portal = existingItem[kSecAttrGeneric as String] as? String
         else {
             return nil
         }
         
-        return CredentialsData(username: username, password: password)
+        return CredentialsData(portal: portal, username: username, password: password)
     }
 }
