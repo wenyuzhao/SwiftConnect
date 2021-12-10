@@ -2,4 +2,5 @@
 
 An openconnect GUI client for macOS.
 
-![Screenshot](screenshots/connected.png)
+![Screenshot](screenshots/login.png) ![Screenshot](screenshots/connected.png)
+
