@@ -46,7 +46,7 @@ class VPNController: ObservableObject {
     
     func start(username: String, password: String, _ onLaunch: @escaping (_ succ: Bool) -> Void) {
         state = .processing
-        AppDelegate.handleConnectionChange(false)
+        AppDelegate.shared.vpnConnectionDidChange(connected: false)
         // Prepare commands
         print("[openconnect start]")
         let logPath = "\(NSTemporaryDirectory())/\(NSUUID().uuidString)";
@@ -73,7 +73,7 @@ class VPNController: ObservableObject {
                 DispatchQueue.main.async {
                     if self.state != .stopped {
                         self.state = .stopped
-                        AppDelegate.handleConnectionChange(false)
+                        AppDelegate.shared.vpnConnectionDidChange(connected: false)
                     }
                 }
             }
@@ -95,7 +95,7 @@ class VPNController: ObservableObject {
             guard source.data.contains(.extend) else { return }
             if self.state == .processing {
                 self.state = .launched
-                AppDelegate.handleConnectionChange(true)
+                AppDelegate.shared.vpnConnectionDidChange(connected: true)
                 callback()
             }
         }
@@ -111,7 +111,7 @@ class VPNController: ObservableObject {
         print("[kill openconnect]")
         run("pkill", "-9", "openconnect");
         state = .stopped
-        AppDelegate.handleConnectionChange(false)
+        AppDelegate.shared.vpnConnectionDidChange(connected: false)
     }
     
     static func killOpenConnect() {

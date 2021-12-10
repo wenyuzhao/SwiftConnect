@@ -13,8 +13,12 @@ import SwiftUI
 class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     static var shared: AppDelegate!;
     static var pinPopover = false
-    static var handleConnectionChange: (_ connected: Bool) -> Void = { _ in };
     
+    private lazy var icon: NSImage = {
+        let image = NSImage(named: "AppIcon")!
+        image.size = NSSize(width: 18, height: 18)
+        return image
+    }()
     private lazy var popover: NSPopover = {
         let popover = NSPopover()
         let contentView = ContentView()
@@ -26,15 +30,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     }()
     private lazy var statusItem: NSStatusItem = {
         let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-        statusItem.button?.title = "🔘"
+        statusItem.button?.image = icon
+        statusItem.button?.image?.isTemplate = true
         statusItem.button!.action = #selector(togglePopover(sender:))
         statusItem.button!.sendAction(on: [.leftMouseUp, .rightMouseUp])
-        Self.handleConnectionChange = { connected in
-            self.statusItem.button?.title = connected ? "🌐" : "🔘"
-        }
         return statusItem
     }()
     private lazy var contextMenu: ContextMenu = ContextMenu(statusBarItem: statusItem)
+    
+    func vpnConnectionDidChange(connected: Bool) {
+        statusItem.button?.image = icon
+        statusItem.button?.image?.isTemplate = !connected
+    }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         Self.shared = self;
