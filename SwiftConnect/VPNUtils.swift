@@ -43,12 +43,15 @@ class VPNController: ObservableObject {
     @Published public var proto: VPNProtocol = .globalProtect
     
     private var currentLogURL: URL?;
+    private static var command: AsyncCommand?;
     
     func start(credentials: Credentials, save: Bool) {
         if save {
             credentials.save()
         }
         AppDelegate.shared.pinPopover = true
+        Self.command?.stop();
+        Self.command = nil
         start(portal: credentials.portal, username: credentials.username, password: credentials.password) { succ in
             AppDelegate.shared.pinPopover = false
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -80,6 +83,7 @@ class VPNController: ObservableObject {
         let command = runAsync("osascript", "-e", """
             do shell script \"\(shellCommandWithIO)\" with prompt \"Start OpenConnect\" with administrator privileges
         """);
+        Self.command = command;
         // Completion callback
         command.onCompletion { _ in
             if self.state != .stopped {
@@ -128,9 +132,8 @@ class VPNController: ObservableObject {
     
     static func killOpenConnect() {
         print("[kill openconnect]")
-        run("osascript", "-e", """
-            do shell script \"pkill -9 openconnect\" with prompt \"Stop OpenConnect\" with administrator privileges
-        """)
+        command?.stop();
+        command = nil;
     }
     
     func openLogFile() {
