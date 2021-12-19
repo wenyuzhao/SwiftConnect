@@ -7,6 +7,7 @@
 
 import Cocoa
 import SwiftUI
+import SwiftShell
 
 
 
@@ -57,6 +58,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         if let window = NSApplication.shared.windows.first {
             window.close()
         }
+        if !testPrivilege() {
+            relaunch()
+        }
         // Initialize statusItem
         statusItem.button!.target = self
     }
@@ -92,6 +96,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     
     func closePopover() {
         popover.performClose(self)
+    }
+    
+    func testPrivilege() -> Bool {
+        return run("sudo", "echo", "test").succeeded;
+    }
+    
+    func relaunch() {
+        let bin = Bundle.main.executablePath!;
+        print("Relaunch: sudo \(bin)");
+        let _ = runAsync("osascript", "-e", """
+            do shell script \"sudo \(bin) &\" with prompt \"Start OpenConnect on privileged mode\" with administrator privileges
+        """);
+        NSApp.terminate(nil)
     }
 }
 
