@@ -99,14 +99,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     }
     
     func testPrivilege() -> Bool {
-        return run("sudo", "echo", "test").succeeded;
+        return getuid() == 0;
     }
     
     func relaunch() {
         let bin = Bundle.main.executablePath!;
         print("Relaunch: sudo \(bin)");
-        let _ = runAsync("osascript", "-e", """
-            do shell script \"sudo \(bin) &\" with prompt \"Start OpenConnect on privileged mode\" with administrator privileges
+        let _ = try! runAndPrint(bash: """
+            osascript -e "do shell script \\"sudo '\(bin)' &\\" with prompt \\"Start OpenConnect on privileged mode\\" with administrator privileges"&
         """);
         NSApp.terminate(nil)
     }
