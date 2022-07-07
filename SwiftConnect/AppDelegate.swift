@@ -52,6 +52,9 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     }
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
+        if ContentView.inPreview {
+            return;
+        }
         // Hide from dock
         NSApp.setActivationPolicy(.accessory)
         // Hide app window

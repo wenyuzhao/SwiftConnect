@@ -153,7 +153,7 @@ class Credentials: ObservableObject {
     @Published public var password: String
     
     init() {
-        if let data = KeychainService.shared.load() {
+        if let data = ContentView.inPreview ? nil : KeychainService.shared.load() {
             username = data.username
             password = data.password
             portal = data.portal
