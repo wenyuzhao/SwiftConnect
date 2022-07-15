@@ -109,7 +109,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
         let bin = Bundle.main.executablePath!;
         print("Relaunch: sudo \(bin)");
         let _ = try! runAndPrint(bash: """
-            osascript -e "do shell script \\"sudo '\(bin)' &\\" with prompt \\"Start OpenConnect on privileged mode\\" with administrator privileges"&
         """);
         NSApp.terminate(nil)
     }

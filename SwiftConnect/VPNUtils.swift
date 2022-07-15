@@ -135,7 +135,7 @@ class VPNController: ObservableObject {
     
     static func killOpenConnect() {
         print("[openconnect] kill")
-        run("pkill", "-9", "openconnect");
+        run("pkill", "openconnect");
     }
     
     func openLogFile() {
